@@ -604,7 +604,7 @@
     const N_TRAFFIC = CFG.level === 2 ? 7 : 5;
     const BASE_SPD = CFG.level === 2 ? 26 : 18;
     const MAX_SPD = CFG.level === 2 ? 70 : 55;
-    const STEER_SPD = 4.5;
+    const STEER_SPD = 6.5;
     const CAR_Z = -3;   // world z of player car
     const CAM_Z = 0;    // camera rig z (world)
     const COLL_X = 1.35;
@@ -1325,7 +1325,7 @@
         const yaw = rot ? rot.y : 0;
         // Proportional gaze (smooth steering based on head turn degree)
         if (Math.abs(yaw) > 3) {
-          gazeS = Math.max(-1, Math.min(1, yaw / -20)); // negative yaw means looking left
+          gazeS = Math.max(-1, Math.min(1, yaw / -15)); // negative yaw means looking left
         }
       }
 
@@ -1548,10 +1548,10 @@
       window.addEventListener('deviceorientation', (e) => {
         const angle = _getSteerAngle(e);
         // Proportional tilt (gradual steering depending on angle)
-        if (Math.abs(angle) < 4) {
+        if (Math.abs(angle) < 3.5) {
           S.gammaSteer = 0;  // deadzone
         } else {
-          S.gammaSteer = Math.max(-1, Math.min(1, angle / 25));
+          S.gammaSteer = Math.max(-1, Math.min(1, angle / 18));
         }
       }, true);
     }
