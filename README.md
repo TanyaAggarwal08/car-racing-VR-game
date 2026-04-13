@@ -146,19 +146,6 @@ All audio is synthesized in real-time using the **Web Audio API** — no externa
 
 > Music can be toggled in Setup or with `M` key during gameplay.
 
----
 
-## 👤 Credits
-
-| Role | Info |
-|---|---|
-| Developer | Student Name |
-| Student ID | 12345678 |
-| Course | Virtual Reality & Games |
-| University | Your University · 2024–2025 |
-| VR Engine | [A-Frame](https://aframe.io) 1.4.0 |
-| Fonts | [Press Start 2P](https://fonts.google.com/specimen/Press+Start+2P) (Google Fonts) |
-
----
 
 *No blood. No violence. Just pure neon speed.* 🌅
