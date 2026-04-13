@@ -414,7 +414,6 @@
       z-index: 201;
     }
 
-    /* ======= Controls hint ======= */
     #ctrl-hint {
       position: fixed;
       bottom: 90px;
@@ -425,6 +424,17 @@
       text-align: right;
       pointer-events: none;
       line-height: 2;
+    }
+
+    /* ======= Mobile tap-to-start prompt ======= */
+    #tap-prompt{
+      display:none; /* shown via JS only on touch devices */
+      position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;
+      align-items:center;justify-content:center;flex-direction:column;
+      background:rgba(0,0,5,0.85);
+      font-family:'Press Start 2P',monospace;
+      pointer-events:none;
+      transition:opacity 0.3s ease;
     }
   </style>
 </head>
@@ -468,6 +478,13 @@
   <!-- Screen flash -->
   <div id="flash"></div>
   <div id="crash-msg">CRASH!</div>
+
+  <!-- Mobile tap-to-unlock audio prompt -->
+  <div id="tap-prompt">
+    <div style="font-size:3em;margin-bottom:15px;animation:flagBounce .6s ease infinite alternate">👆</div>
+    <div style="font-size:1.2em;color:#00ffff;text-shadow:0 0 10px #00ffff;animation:blink 1s step-end infinite">TAP TO START</div>
+    <div style="font-size:0.6em;color:rgba(255,255,255,0.5);margin-top:10px">Tap anywhere to unlock audio</div>
+  </div>
 
   <!-- Finish Line overlay -->
   <div id="ov-finish" style="display:none">
@@ -753,6 +770,33 @@
           ctx = new (window.AudioContext || window.webkitAudioContext)();
           master = ctx.createGain(); master.gain.value = 0.65;
           master.connect(ctx.destination);
+
+          // ── Mobile Audio Unlock ──
+          const _unlock = () => {
+            if(ctx.state === 'suspended') ctx.resume();
+            // Play a silent buffer to truly unlock iOS Safari
+            const buf = ctx.createBuffer(1, 1, 22050);
+            const src = ctx.createBufferSource();
+            src.buffer = buf;
+            src.connect(ctx.destination);
+            src.start(0);
+
+            document.removeEventListener('touchend', _unlock);
+            document.removeEventListener('mousedown', _unlock);
+            
+            // Hide the tap prompt immediately
+            const tp = document.getElementById('tap-prompt');
+            if(tp) { tp.style.opacity='0'; setTimeout(()=>tp.style.display='none', 300); }
+          };
+          document.addEventListener('touchend', _unlock, { once: true, passive: true });
+          document.addEventListener('mousedown', _unlock, { once: true });
+
+          ctx.addEventListener('statechange', () => {
+            if(ctx.state === 'running' && !engineOsc) {
+              startEngine();
+              if(CFG.music) startMusic();
+            }
+          });
         } catch (e) { console.warn('Audio:', e); }
       }
 
@@ -1274,18 +1318,25 @@
     });
 
     function _doControls(dt) {
-      const cam = document.getElementById('main-camera');
-      const rot = cam && cam.getAttribute('rotation');
-      const yaw = rot ? rot.y : 0;
-
-      // Head-look steer (camera yaw)
+      // ── GAZE / HEAD-LOOK ──────────
       let gazeS = 0;
-      const THRESH = 14;
-      if (yaw < -THRESH) gazeS = 1; // looking left → A-Frame yaw negative = look left
-      else if (yaw > THRESH) gazeS = -1; // looking right
+      if (CFG.control === 'gaze' || CFG.control === 'tilt') {
+        const cam = document.getElementById('main-camera');
+        const rot = cam ? cam.getAttribute('rotation') : null;
+        const yaw = rot ? rot.y : 0;
+        const THRESH = 14;
+        if (yaw < -THRESH) gazeS = 1;
+        else if (yaw > THRESH) gazeS = -1;
+      }
 
-      // Combine: keyboard > gammaSteer > gazeSteer
-      const finalS = S.keySteer || S.gammaSteer || gazeS;
+      // ── KEYBOARD ────────────
+      const keyS = S.keySteer;
+
+      // ── TILT (Device Orientation) ──────────────
+      const tiltS = (CFG.control === 'tilt') ? S.gammaSteer : 0;
+
+      // Combine: keyboard > tilt > gaze
+      const finalS = keyS || tiltS || gazeS;
       S.steerDir = finalS;
 
       // Apply steer
@@ -1481,13 +1532,25 @@
     // ================================================================
     //  CONTROLS: Device Orientation + Keyboard
     // ================================================================
-    window.addEventListener('deviceorientation', (e) => {
-      const g = e.gamma;
-      if (g === null) return;
-      if (g < -13) S.gammaSteer = -1;
-      else if (g > 13) S.gammaSteer = 1;
-      else S.gammaSteer = 0;
-    }, true);
+    // ── Device Orientation ──
+    const _getSteerAngle = (e) => {
+      const isLandscape = window.innerWidth > window.innerHeight;
+      if (isLandscape) return e.beta || 0;
+      return e.gamma || 0;
+    };
+
+    if (CFG.control === 'tilt') {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().catch(console.error);
+      }
+      window.addEventListener('deviceorientation', (e) => {
+        const angle = _getSteerAngle(e);
+        const TILT_THRESH = 12;
+        if (angle < -TILT_THRESH) S.gammaSteer = -1;
+        else if (angle > TILT_THRESH) S.gammaSteer = 1;
+        else S.gammaSteer = 0;
+      }, true);
+    }
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') S.keySteer = -1;
@@ -1504,6 +1567,13 @@
     // ================================================================
     document.addEventListener('DOMContentLoaded', () => {
       Audio.init();
+      
+      // Explicitly show tap-to-start prompt on touch devices
+      if (('ontouchstart' in window) || navigator.maxTouchPoints > 0) {
+        const tp = document.getElementById('tap-prompt');
+        if (tp) tp.style.display = 'flex';
+      }
+
       const scene = document.getElementById('main-scene');
       scene.addEventListener('loaded', () => {
         buildScene();
