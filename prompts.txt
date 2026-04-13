@@ -1,0 +1,19 @@
+1. Create a car racing game using aframe. Follow these necessities : """• A manual about how to set up/install and how to control and run the game; a manual can be a (GitHub) webpage • Flashscreen at the beginning of the game with your name and other credentials • A setup option at the beginning of the game • At least two levels • Sound effects and background music (the background music can be muted in the setup) • Scoreboard (always visible) • Gaze-based and/or head-tilt/head-direction control(s) without hands • Stereoscopic view with a mobile phone • Your own objects with textures (simple geometric objects without textures are not accepted) • Collision detection • Neither blood nor violence""" and create a full working game. if sound or texture or image is needed to make it look more real, use online links. Make the theme interesting and unique. May be a retro style would be good. 
+
+2. the background and colours are not good at all. You can use the image i put in images folder as the background and if possible run the road on ktop of the road in the image or just use the road in the image instead of creating one  
+
+3. CAN WE MAKE THE ROAD a little loa to match the background! it seems like its in the air and use a road with grey color dont make it transparent. 
+
+4. can we finish level one in 2 minutes? It seems like going endless. and also the cars main body seem to be transparent, can you make sure it render correctly. 
+
+5. make the game to run for a 1.5 minute and then pass the finishing loop. Also for the level 2, use another image given in image folder called "night sky.png" instead of darkening the whole game too much as it blurs the screen. 
+
+6. can you make the game end in 1 minute. by that i mean in one minute it shoudl reach its target loop so there is chance of wining 
+
+7. can you check if the three controls are working correctly. If all three controls are working in each game then dont create three different buttons if there is nothing different. If there is diffenrce in each type liek Vr experince for phone and dektop then make sure its wokring correctly as i just saw the landscape doenst seem to give the correct movement. 
+
+8. can you also check why there is no sound coming on mobile phoen when i play this game there 
+
+9. try again 
+
+
