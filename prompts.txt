@@ -16,4 +16,4 @@
 
 9. try again 
 
-
+10. Its not moving properly in the landscape mode, It also seems like the movement speed is too much, and its not moving left and right properly with slight phone movements 
