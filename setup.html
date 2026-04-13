@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SYNTHWAVE RACER — SETUP</title>
+  <meta name="description" content="Setup options for Synthwave Racer VR."/>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"/>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      background:#04000f;
+      color:#fff;
+      font-family:'Press Start 2P',monospace;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    .bg-grid{
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:
+        repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,0,200,0.06) 39px,rgba(255,0,200,0.06) 40px),
+        repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,0,200,0.06) 39px,rgba(255,0,200,0.06) 40px);
+      pointer-events:none;z-index:0;
+    }
+    .scanlines{
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px);
+      pointer-events:none;z-index:200;
+    }
+
+    .setup-box{
+      position:relative;z-index:10;
+      width:100%;max-width:700px;
+      border:2px solid rgba(0,255,255,0.3);
+      background:rgba(0,0,10,0.85);
+      padding:30px 36px 36px;
+      box-shadow:0 0 40px rgba(0,255,255,0.08),inset 0 0 30px rgba(0,0,0,0.5);
+    }
+
+    h1{
+      font-size:clamp(1em,3vw,1.5em);
+      text-align:center;
+      background:linear-gradient(90deg,#ff6b00,#ff00aa,#00ffff);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      filter:drop-shadow(0 0 12px rgba(255,0,170,0.6));
+      margin-bottom:8px;
+    }
+    .h1-sub{
+      text-align:center;
+      font-size:0.4em;
+      color:#00ffff;
+      text-shadow:0 0 8px #00ffff;
+      letter-spacing:4px;
+      margin-bottom:32px;
+    }
+
+    /* ---- Options ---- */
+    .option-section{
+      margin-bottom:28px;
+    }
+    .opt-label{
+      font-size:0.48em;
+      color:#ff00aa;
+      text-shadow:0 0 6px #ff00aa;
+      letter-spacing:2px;
+      margin-bottom:14px;
+      display:block;
+    }
+
+    .opt-row{
+      display:flex;gap:14px;flex-wrap:wrap;
+    }
+
+    .opt-card{
+      flex:1;min-width:140px;
+      border:2px solid rgba(255,255,255,0.12);
+      padding:16px 12px;
+      cursor:pointer;
+      text-align:center;
+      transition:all 0.15s;
+      background:rgba(0,0,0,0.4);
+      position:relative;
+      user-select:none;
+    }
+    .opt-card .card-title{font-size:0.55em;color:#cccccc;margin-bottom:6px;}
+    .opt-card .card-desc{font-size:0.38em;color:#888888;line-height:1.8;}
+    .opt-card .card-icon{font-size:1.6em;display:block;margin-bottom:8px;}
+
+    .opt-card.selected{
+      border-color:#00ffff;
+      background:rgba(0,255,255,0.06);
+      box-shadow:0 0 14px rgba(0,255,255,0.25);
+    }
+    .opt-card.selected .card-title{color:#00ffff;text-shadow:0 0 8px #00ffff;}
+    .opt-card:hover:not(.selected){border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.03);}
+
+    .opt-card .check-badge{
+      position:absolute;top:8px;right:8px;
+      font-size:0.5em;
+      color:#00ffff;
+      opacity:0;
+      text-shadow:0 0 8px #00ffff;
+    }
+    .opt-card.selected .check-badge{opacity:1;}
+
+    /* Toggle row */
+    .toggle-row{
+      display:flex;align-items:center;gap:16px;
+    }
+    .toggle-btn{
+      font-family:'Press Start 2P',monospace;
+      padding:12px 22px;
+      font-size:0.5em;
+      border:2px solid;
+      cursor:pointer;
+      background:transparent;
+      transition:all 0.15s;
+    }
+    .toggle-on{color:#00ff88;border-color:#00ff88;box-shadow:0 0 10px rgba(0,255,136,0.3);}
+    .toggle-on:hover,.toggle-on.active{background:#00ff88;color:#000;}
+    .toggle-off{color:#ff4444;border-color:#ff4444;box-shadow:0 0 10px rgba(255,68,68,0.3);}
+    .toggle-off:hover,.toggle-off.active{background:#ff4444;color:#000;}
+    .toggle-note{font-size:0.38em;color:#555555;line-height:1.8;}
+
+    /* Divider */
+    .divider{border:none;border-top:1px solid rgba(255,0,170,0.15);margin:24px 0;}
+
+    /* Start button */
+    .start-btn{
+      font-family:'Press Start 2P',monospace;
+      width:100%;
+      padding:18px;
+      font-size:clamp(0.6em,2vw,0.95em);
+      border:2px solid #00ffff;
+      color:#00ffff;
+      background:transparent;
+      cursor:pointer;
+      box-shadow:0 0 16px rgba(0,255,255,0.3),inset 0 0 20px rgba(0,255,255,0.04);
+      transition:all 0.15s;
+      letter-spacing:2px;
+      margin-top:8px;
+    }
+    .start-btn:hover{
+      background:#00ffff;color:#000;
+      box-shadow:0 0 30px #00ffff;
+    }
+
+    .back-btn{
+      font-family:'Press Start 2P',monospace;
+      position:fixed;top:16px;left:16px;
+      padding:10px 14px;
+      font-size:0.38em;
+      border:1px solid rgba(255,255,255,0.2);
+      color:rgba(255,255,255,0.4);
+      background:transparent;
+      cursor:pointer;
+      text-decoration:none;
+      z-index:50;
+      transition:all 0.15s;
+    }
+    .back-btn:hover{color:#fff;border-color:#fff;}
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="scanlines"></div>
+  <a href="index.html" class="back-btn" id="backBtn">◄ BACK</a>
+
+  <div class="setup-box">
+    <h1>GAME SETUP</h1>
+    <div class="h1-sub">CONFIGURE YOUR RACE</div>
+
+    <!-- Level Select -->
+    <div class="option-section">
+      <span class="opt-label">◈ SELECT STARTING LEVEL</span>
+      <div class="opt-row">
+        <div class="opt-card selected" id="lvl1Card" onclick="selectLevel(1)">
+          <span class="check-badge">✓</span>
+          <span class="card-icon">🌅</span>
+          <div class="card-title">LEVEL 1</div>
+          <div class="card-desc">CITY SUNSET<br>Moderate Traffic<br>90 Seconds</div>
+        </div>
+        <div class="opt-card" id="lvl2Card" onclick="selectLevel(2)">
+          <span class="check-badge">✓</span>
+          <span class="card-icon">🌃</span>
+          <div class="card-title">LEVEL 2</div>
+          <div class="card-desc">NEON NIGHT<br>Heavy Traffic<br>90 Seconds</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- Music Toggle -->
+    <div class="option-section">
+      <span class="opt-label">◈ BACKGROUND MUSIC</span>
+      <div class="toggle-row">
+        <button class="toggle-btn toggle-on active" id="musicOnBtn" onclick="setMusic(true)">🔊 ON</button>
+        <button class="toggle-btn toggle-off" id="musicOffBtn" onclick="setMusic(false)">🔇 OFF</button>
+        <span class="toggle-note">Synthwave beat<br>can be muted anytime<br>with P key</span>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <!-- Control Mode -->
+    <div class="option-section">
+      <span class="opt-label">◈ CONTROL MODE</span>
+      <div class="opt-row">
+        <div class="opt-card selected" id="ctrlGaze" onclick="selectControl('gaze')">
+          <span class="check-badge">✓</span>
+          <span class="card-icon">👀</span>
+          <div class="card-title">HEAD LOOK</div>
+          <div class="card-desc">Turn your head<br>left/right to steer<br>Best for VR desktop</div>
+        </div>
+        <div class="opt-card" id="ctrlTilt" onclick="selectControl('tilt')">
+          <span class="check-badge">✓</span>
+          <span class="card-icon">📱</span>
+          <div class="card-title">HEAD TILT</div>
+          <div class="card-desc">Tilt phone<br>left/right to steer<br>Best for mobile VR</div>
+        </div>
+        <div class="opt-card" id="ctrlKeys" onclick="selectControl('keys')">
+          <span class="check-badge">✓</span>
+          <span class="card-icon">⌨️</span>
+          <div class="card-title">KEYBOARD</div>
+          <div class="card-desc">Arrow keys<br>or A / D<br>Best for testing</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider"/>
+
+    <button class="start-btn" onclick="startGame()" id="startBtn">▶ START RACE ◄</button>
+  </div>
+
+  <script>
+    const settings = { level: 1, music: true, control: 'gaze' };
+
+    function selectLevel(n) {
+      settings.level = n;
+      document.getElementById('lvl1Card').classList.toggle('selected', n===1);
+      document.getElementById('lvl2Card').classList.toggle('selected', n===2);
+    }
+    function setMusic(on) {
+      settings.music = on;
+      document.getElementById('musicOnBtn').classList.toggle('active', on);
+      document.getElementById('musicOffBtn').classList.toggle('active', !on);
+    }
+    function selectControl(c) {
+      settings.control = c;
+      ['ctrlGaze','ctrlTilt','ctrlKeys'].forEach(id=>document.getElementById(id).classList.remove('selected'));
+      const map = {gaze:'ctrlGaze',tilt:'ctrlTilt',keys:'ctrlKeys'};
+      document.getElementById(map[c]).classList.add('selected');
+    }
+    function startGame() {
+      const p = new URLSearchParams({
+        level: settings.level,
+        music: settings.music,
+        control: settings.control
+      });
+      window.location.href = 'game.html?' + p.toString();
+    }
+  </script>
+</body>
+</html>
